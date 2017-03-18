@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/main_drawer"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_left"
+        android:layout_width="250dp"
+        android:background="#f00"
+        android:layout_gravity="start"
+        android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/main_toolbar"
+            android:layout_width="match_parent"
+            android:background="#0f0"
+            android:layout_height="?actionBarSize"></android.support.v7.widget.Toolbar>
+
+        <com.ren.smartcity.NoScrollViewPager
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/main_viewpager"
+            android:layout_weight="1"
+            ></com.ren.smartcity.NoScrollViewPager>
+        <FrameLayout
+            android:visibility="gone"
+            android:id="@+id/main_frame"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"></FrameLayout>
+        <RadioGroup
+            android:id="@+id/rg_tab"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/bottom_tab_bg"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_home"
+                style="@style/main_tab_rg_style"
+                android:checked="true"
+                android:drawableTop="@drawable/tab_home_selector"
+                android:text="首页" />
+
+            <RadioButton
+                android:id="@+id/rb_newscener"
+                style="@style/main_tab_rg_style"
+                android:drawableTop="@drawable/tab_newscenter_selector"
+                android:text="新闻中心" />
+
+            <RadioButton
+                android:id="@+id/rb_smartservice"
+                style="@style/main_tab_rg_style"
+                android:drawableTop="@drawable/tab_smartservice_selector"
+                android:text="智慧服务" />
+
+            <RadioButton
+                android:id="@+id/rb_govaffairs"
+                style="@style/main_tab_rg_style"
+                android:drawableTop="@drawable/tab_govaffairs_selector"
+                android:text="政务" />
+
+            <RadioButton
+                android:id="@+id/rb_setting"
+                style="@style/main_tab_rg_style"
+                android:drawableTop="@drawable/tab_setting_selector"
+                android:text="设置" />
+        </RadioGroup>
+
+    </LinearLayout>
+</android.support.v4.widget.DrawerLayout>
