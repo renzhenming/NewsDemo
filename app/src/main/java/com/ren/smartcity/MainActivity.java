@@ -10,6 +10,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
@@ -19,12 +20,15 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.ren.smartcity.adapter.LeftMenuAdapter;
 import com.ren.smartcity.adapter.TabAdapter;
+import com.ren.smartcity.bean.NewsBean;
 import com.ren.smartcity.fragment.GovFragment;
 import com.ren.smartcity.fragment.HomeFragment;
 import com.ren.smartcity.fragment.NewsFragment;
 import com.ren.smartcity.fragment.SettingFragment;
 import com.ren.smartcity.fragment.SmartFragment;
+import com.ren.smartcity.interfacepackage.BaseLoadNetOperator;
 
 import java.util.ArrayList;
 
@@ -56,11 +60,18 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     RecyclerView mainLeft;
     @InjectView(R.id.main_drawer)
     DrawerLayout mainDrawer;
-    @InjectView(R.id.main_toolbar)
-    Toolbar mainToolbar;
     @InjectView(R.id.main_viewpager)
     ViewPager mainViewpager;
     private ArrayList<Fragment> mList = new ArrayList<>();
+
+    public ArrayList<NewsBean.NewsLeftBean> newsBeens;
+    private LeftMenuAdapter adapter;
+
+    public void setNewsBeens(ArrayList<NewsBean.NewsLeftBean> newsBeens) {
+        this.newsBeens = newsBeens;
+        //初始化左侧菜单
+        adapter.setData(newsBeens);
+    }
 
     private HomeFragment homeFragment;
     private NewsFragment newsFragment;
@@ -78,18 +89,18 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         initVp();
         manager = getSupportFragmentManager();
         //addFragment(R.id.rb_home);
+        initLeftMenu();
+    }
+
+    private void initLeftMenu() {
+        mainLeft.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        adapter = new LeftMenuAdapter(this, newsBeens);
+        mainLeft.setAdapter(adapter);
     }
 
     private void initVp() {
-        setSupportActionBar(mainToolbar);
-
-        ActionBar supportActionBar = getSupportActionBar();
-        //设置是否添加显示NavigationIcon
-        supportActionBar.setDisplayHomeAsUpEnabled(true);
-        //设置标题
-        mainToolbar.setTitle("智慧城市");
-        //设置颜色
-        mainToolbar.setTitleTextColor(Color.WHITE);
+        //设置可滑出
+        mainDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
         //添加fragment
         mList.add(new HomeFragment());
         mList.add(new NewsFragment());
@@ -99,21 +110,6 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
 
         TabAdapter adapter = new TabAdapter(mList,getSupportFragmentManager());
         mainViewpager.setAdapter(adapter);
-        //侧滑设置
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mainDrawer, mainToolbar, R.string.open, R.string.close) {
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                Toast.makeText(getApplicationContext(), "open", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                Toast.makeText(getApplicationContext(), "close", Toast.LENGTH_SHORT).show();
-            }
-        };
-        mainDrawer.addDrawerListener(toggle);
         rgTab.setOnCheckedChangeListener(this);
     }
 
@@ -123,22 +119,54 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         int item = -1;
         switch (checkedId) {
             case R.id.rb_home:
+                //设置不可滑出
+                mainDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 item = 0;
                 break;
             case R.id.rb_newscener:
+                //设置可滑出
+                mainDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 item = 1;
                 break;
             case R.id.rb_smartservice:
+                //设置可滑出
+                mainDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 item = 2;
                 break;
             case R.id.rb_govaffairs:
+                //设置可滑出
+                mainDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 item = 3;
                 break;
             case R.id.rb_setting:
+                //设置不可滑出
+                mainDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 item = 4;
                 break;
         }
-        mainViewpager.setCurrentItem(item,false);
+        if (item != -1){
+            mainViewpager.setCurrentItem(item,false);
+            /**
+             * 这里是加载网络数据的入口，所以每一个fragment中只要 完成加载的方法就可以了，
+             * 调用是在这里发生的
+             */
+            //获取到点击位置的fragment，然后调用fragment的加载数据的方法
+            BaseFragment fragment = (BaseFragment) mList.get(item);
+            //并不是每一个fragment都需要并且可以加载网络数据，因为我们让可以的fragment都实现了
+            // BaseLoadNetOperator接口，所以这里判断一下
+            if (fragment instanceof BaseLoadNetOperator){
+                ((BaseLoadNetOperator) fragment).onLoadOperator();
+            }
+        }
+
+    }
+
+    public void closeLeftMenu(){
+        mainDrawer.closeDrawers();
+    }
+    public BaseFragment getCurrentFragment(){
+        int currentItem = mainViewpager.getCurrentItem();
+        return (BaseFragment) mList.get(currentItem);
     }
 
     private void addFragment(int checkedId) {

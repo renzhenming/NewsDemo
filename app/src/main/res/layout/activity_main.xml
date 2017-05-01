@@ -3,22 +3,11 @@
     android:layout_width="match_parent"
     android:id="@+id/main_drawer"
     android:layout_height="match_parent">
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/main_left"
-        android:layout_width="250dp"
-        android:background="#f00"
-        android:layout_gravity="start"
-        android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/main_toolbar"
-            android:layout_width="match_parent"
-            android:background="#0f0"
-            android:layout_height="?actionBarSize"></android.support.v7.widget.Toolbar>
 
         <com.ren.smartcity.NoScrollViewPager
             android:layout_width="match_parent"
@@ -35,7 +24,7 @@
         <RadioGroup
             android:id="@+id/rg_tab"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="70dp"
             android:background="@mipmap/bottom_tab_bg"
             android:gravity="center_vertical"
             android:orientation="horizontal">
@@ -73,4 +62,10 @@
         </RadioGroup>
 
     </LinearLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_left"
+        android:layout_width="250dp"
+        android:background="#000"
+        android:layout_gravity="start"
+        android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
 </android.support.v4.widget.DrawerLayout>

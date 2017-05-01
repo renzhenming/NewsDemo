@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#000"
+    android:padding="10dp"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+    <TextView
+        android:layout_width="match_parent"
+        android:text="菜单"
+        android:drawablePadding="8dp"
+        android:textSize="17sp"
+        android:id="@+id/menu_title"
+        android:gravity="center_vertical"
+        android:textColor="@color/selector_left_menu_text"
+        android:drawableLeft="@drawable/selector_left_menu"
+        android:layout_height="50dp" />
+</RelativeLayout>
