@@ -11,8 +11,16 @@ public class Constant {
     public final static String KEY_HAS_READ = "key_has_read";
 
     //服务器的主机
-    public final static String HOST = "http://192.168.1.106:8080/zhbj";
+    public final static String HOST = "http://192.168.1.101:8080/zhbj";
 
     //新闻中心页面的数据地址
     public final static String NEWSCENTER_URL = HOST + "/categories.json";
+
+    public static String replaceImageUrl(String url){
+        String result = "";
+        if (url != null && url.contains("http://10.0.2.2:8080/zhbj")){
+            result = url.replace("http://10.0.2.2:8080/zhbj", HOST);
+        }
+        return result;
+    }
 }

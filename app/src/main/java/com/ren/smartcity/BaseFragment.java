@@ -3,6 +3,7 @@ package com.ren.smartcity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,7 @@ public abstract class BaseFragment extends Fragment {
     ImageButton ibPicType;
     @InjectView(R.id.container)
     FrameLayout container;
+    public MainActivity mMainActivity;
 
     @Nullable
     @Override
@@ -41,6 +43,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mMainActivity = (MainActivity) getActivity();
         initTitle();
     }
 
@@ -50,8 +53,7 @@ public abstract class BaseFragment extends Fragment {
     public abstract void initTitle();
 
     /**
-     * 创建布局
-     * 父类中没有调用，需要子类在适当时机调用
+     * 用于在子fragment中创建布局，创建之后需要调用本类中的addView添加布局到framelayout中
      */
     public abstract View createView();
     @Override

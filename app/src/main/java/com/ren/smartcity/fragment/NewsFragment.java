@@ -14,10 +14,16 @@ import com.ren.smartcity.MainActivity;
 import com.ren.smartcity.R;
 import com.ren.smartcity.adapter.TabPagerAdapter;
 import com.ren.smartcity.bean.NewsBean;
+import com.ren.smartcity.fragment.tab.NewsCenterContentTabPager;
 import com.ren.smartcity.interfacepackage.BaseLoadNetOperator;
 import com.ren.smartcity.utils.Constant;
+import com.ren.smartcity.utils.MyLogger;
+import com.ren.smartcity.utils.MyToast;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -25,10 +31,12 @@ import okhttp3.Call;
 
 public class NewsFragment extends BaseFragment implements BaseLoadNetOperator {
 
+    private static final String TAG = "NewsFragment";
     TabLayout tabLayout;
     ImageButton ibNext;
     ViewPager vpNewscenterContent;
     private NewsBean newsBean;
+    private List<NewsCenterContentTabPager> mList;
 
     @Override
     public void initTitle() {
@@ -44,7 +52,12 @@ public class NewsFragment extends BaseFragment implements BaseLoadNetOperator {
         ibNext = (ImageButton) view.findViewById(R.id.ib_next);
         vpNewscenterContent = (ViewPager) view.findViewById(R.id.vp_newscenter_content);
         //设置数据
-        TabPagerAdapter viewPagerAdapter = new TabPagerAdapter(getActivity(),newsBean.data.get(0).children);
+        mList = new ArrayList<>();
+        for (int i = 0 ; i < newsBean.data.get(0).children.size();i++){
+            NewsCenterContentTabPager tabPager = new NewsCenterContentTabPager(mMainActivity);
+            mList.add(tabPager);
+        }
+        TabPagerAdapter viewPagerAdapter = new TabPagerAdapter(mList,newsBean.data.get(0).children);
         vpNewscenterContent.setAdapter(viewPagerAdapter);
         tabLayout.setupWithViewPager(vpNewscenterContent);
         tabLayout.setTabGravity(TabLayout.GRAVITY_CENTER);
@@ -61,12 +74,12 @@ public class NewsFragment extends BaseFragment implements BaseLoadNetOperator {
         OkHttpUtils.get().url(url).build().execute(new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
-                System.out.println(e.toString());
+                MyToast.show(mMainActivity,e.getMessage());
             }
 
             @Override
             public void onResponse(String response, int id) {
-                System.out.println(response);
+                MyLogger.d(TAG,response);
                 parseData(response);
             }
         });

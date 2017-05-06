@@ -99,8 +99,8 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     }
 
     private void initVp() {
-        //设置可滑出
-        mainDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+        //不可划出
+        mainDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         //添加fragment
         mList.add(new HomeFragment());
         mList.add(new NewsFragment());

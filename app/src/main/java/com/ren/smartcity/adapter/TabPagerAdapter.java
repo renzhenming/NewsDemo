@@ -2,6 +2,7 @@ package com.ren.smartcity.adapter;
 
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,19 +11,24 @@ import android.widget.TextView;
 
 import com.ren.smartcity.R;
 import com.ren.smartcity.bean.NewsBean;
+import com.ren.smartcity.fragment.tab.NewsCenterContentTabPager;
+import com.ren.smartcity.utils.Constant;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.ButterKnife;
 
 /**
  * Created by Administrator on 2017/3/26.
  */
 public class TabPagerAdapter extends PagerAdapter {
     private final ArrayList<NewsBean.NewsLeftBean.NewsTopBean> children;
-    private final Context context;
+    private final List<NewsCenterContentTabPager> mViews;
 
-    public TabPagerAdapter(Context context, ArrayList<NewsBean.NewsLeftBean.NewsTopBean> children) {
-        this.context = context;
+    public TabPagerAdapter(List<NewsCenterContentTabPager> mViews, ArrayList<NewsBean.NewsLeftBean.NewsTopBean> children) {
         this.children = children;
+        this.mViews = mViews;
     }
 
     @Override
@@ -32,10 +38,9 @@ public class TabPagerAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_top_tab,container,false);
-        TextView textView = (TextView) view.findViewById(R.id.item_tab);
-        String title = children.get(position).title;
-        textView.setText(title);
+        View view = mViews.get(position).view;
+        NewsCenterContentTabPager tabPager = mViews.get(position);
+        tabPager.loadTabNetData(Constant.HOST+children.get(position).url);
         container.addView(view);
         return view;
     }
