@@ -7,10 +7,10 @@
         android:layout_weight="1.5"
         android:layout_width="match_parent"
         android:layout_height="0dp">
-        <android.support.v4.view.ViewPager
+        <com.ren.smartcity.views.SwitchImageViewPager
             android:id="@+id/vp_switch_image"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></android.support.v4.view.ViewPager>
+            android:layout_height="match_parent"></com.ren.smartcity.views.SwitchImageViewPager>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="60dp"

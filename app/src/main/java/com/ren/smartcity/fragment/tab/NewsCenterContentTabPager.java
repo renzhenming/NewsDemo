@@ -1,10 +1,12 @@
 package com.ren.smartcity.fragment.tab;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,14 +17,14 @@ import com.ren.smartcity.adapter.TabTopNewsAdapter;
 import com.ren.smartcity.bean.NewsCenterTabBean;
 import com.ren.smartcity.utils.Constant;
 import com.ren.smartcity.utils.MyLogger;
+import com.ren.smartcity.views.SwitchImageViewPager;
+import com.ren.smartcity.views.ViewPagerController;
 import com.squareup.picasso.Picasso;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.ButterKnife;
 import okhttp3.Call;
 
 /**
@@ -33,10 +35,11 @@ public class NewsCenterContentTabPager {
     private String TAG = this.getClass().getSimpleName();
     private final Context context;
     public final View view;
-    private ViewPager mViewPager;
+    private SwitchImageViewPager mViewPager;
     private TextView mTitle;
     private RecyclerView mRecyclerView;
     private LinearLayout mPointContainer;
+    private NewsCenterTabBean tabBean;
 
     public NewsCenterContentTabPager(Context context) {
         this.context = context;
@@ -45,7 +48,10 @@ public class NewsCenterContentTabPager {
 
     private View initView() {
         View view = LayoutInflater.from(context).inflate(R.layout.newscenter_content_tab,null,false);
-        mViewPager = (ViewPager) view.findViewById(R.id.vp_switch_image);
+        mViewPager = (SwitchImageViewPager) view.findViewById(R.id.vp_switch_image);
+        ViewPagerController controller = new ViewPagerController(context,new AccelerateDecelerateInterpolator());
+        controller.setSrollRate(1000);
+        controller.bindViewPager(mViewPager);
         mTitle = (TextView) view.findViewById(R.id.tv_title);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_news);
         mPointContainer = (LinearLayout) view.findViewById(R.id.ll_point_container);
@@ -70,9 +76,37 @@ public class NewsCenterContentTabPager {
                 });
     }
 
+    private Handler handler = new Handler();
+    private boolean isSwitching = false;
+    class SwitchTask implements Runnable{
+
+        @Override
+        public void run() {
+            int currentItem = mViewPager.getCurrentItem();
+            if (currentItem == tabBean.getData().getTopnews().size()-1){
+                currentItem = 0;
+            }else{
+                currentItem ++ ;
+            }
+            mViewPager.setCurrentItem(currentItem,true);
+            handler.postDelayed(this,2000);
+        }
+    }
+    public void startSwicthPic(){
+        if (!isSwitching){
+            handler.postDelayed(new SwitchTask(),2000);
+            isSwitching = true;
+        }
+    }
+
+    public void stopSwitchPic(){
+        handler.removeCallbacksAndMessages(null);
+        isSwitching = false;
+    }
+
     private void parseData(String response) {
         Gson gson = new Gson();
-        NewsCenterTabBean tabBean = gson.fromJson(response, NewsCenterTabBean.class);
+        tabBean = gson.fromJson(response, NewsCenterTabBean.class);
         //绑定数据
         bindViewData(tabBean);
     }
@@ -106,7 +140,8 @@ public class NewsCenterContentTabPager {
 
         mTitle.setText(topnews.get(0).getTitle());
 
-
+        startSwicthPic();
+        mViewPager.setPager(this);
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -123,6 +158,7 @@ public class NewsCenterContentTabPager {
                         mPointContainer.getChildAt(i).setBackgroundResource(R.drawable.point_gray_bg);
                     }
                 }
+                stopSwitchPic();
 
             }
 
