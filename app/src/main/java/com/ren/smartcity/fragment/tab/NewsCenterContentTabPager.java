@@ -1,8 +1,10 @@
 package com.ren.smartcity.fragment.tab;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +15,13 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.ren.smartcity.R;
+import com.ren.smartcity.adapter.NewsListAdapter;
 import com.ren.smartcity.adapter.TabTopNewsAdapter;
 import com.ren.smartcity.bean.NewsCenterTabBean;
 import com.ren.smartcity.utils.Constant;
 import com.ren.smartcity.utils.MyLogger;
+import com.ren.smartcity.views.RZMRefreshRecyclerView;
+import com.ren.smartcity.views.RecycleViewDivider;
 import com.ren.smartcity.views.SwitchImageViewPager;
 import com.ren.smartcity.views.ViewPagerController;
 import com.squareup.picasso.Picasso;
@@ -37,7 +42,7 @@ public class NewsCenterContentTabPager {
     public final View view;
     private SwitchImageViewPager mViewPager;
     private TextView mTitle;
-    private RecyclerView mRecyclerView;
+    private RZMRefreshRecyclerView mRecyclerView;
     private LinearLayout mPointContainer;
     private NewsCenterTabBean tabBean;
 
@@ -48,13 +53,15 @@ public class NewsCenterContentTabPager {
 
     private View initView() {
         View view = LayoutInflater.from(context).inflate(R.layout.newscenter_content_tab,null,false);
-        mViewPager = (SwitchImageViewPager) view.findViewById(R.id.vp_switch_image);
+        View childHeaderView = LayoutInflater.from(context).inflate(R.layout.child_header_view,null,false);
         ViewPagerController controller = new ViewPagerController(context,new AccelerateDecelerateInterpolator());
         controller.setSrollRate(1000);
+        mViewPager = (SwitchImageViewPager) childHeaderView.findViewById(R.id.vp_switch_image);
         controller.bindViewPager(mViewPager);
-        mTitle = (TextView) view.findViewById(R.id.tv_title);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_news);
-        mPointContainer = (LinearLayout) view.findViewById(R.id.ll_point_container);
+        mTitle = (TextView) childHeaderView.findViewById(R.id.tv_title);
+        mPointContainer = (LinearLayout) childHeaderView.findViewById(R.id.ll_point_container);
+        mRecyclerView = (RZMRefreshRecyclerView) view.findViewById(R.id.rv_news);
+        mRecyclerView.addChildHeaderView(childHeaderView);
         return view;
     }
 
@@ -114,6 +121,15 @@ public class NewsCenterContentTabPager {
     private void bindViewData(NewsCenterTabBean tabBean) {
         //轮播图数据
         bindTopImages(tabBean.getData().getTopnews());
+        //xinwen数据
+        bindRVNews(tabBean.getData().getNews());
+    }
+
+    private void bindRVNews(List<NewsCenterTabBean.DataBean.NewsBean> news) {
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
+        mRecyclerView.addItemDecoration(new RecycleViewDivider(context,LinearLayoutManager.HORIZONTAL,2, Color.BLACK));
+        NewsListAdapter adapter = new NewsListAdapter(context,news);
+        mRecyclerView.setAdapter(adapter);
     }
 
     private void bindTopImages(final List<NewsCenterTabBean.DataBean.TopnewsBean> topnews) {
@@ -126,6 +142,9 @@ public class NewsCenterContentTabPager {
             String topimage = topnews.get(i).getTopimage();
             Picasso.with(context).load(Constant.replaceImageUrl(topimage)).placeholder(R.mipmap.ic_launcher).into(view);
             images.add(view);
+        }
+
+        for (int i = 0 ; i < topnews.size() ; i ++){
             //指示器
             View pointView = new View(context);
             pointView.setBackgroundResource(R.drawable.point_gray_bg);

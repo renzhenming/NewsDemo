@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_weight="1.5"
+    android:layout_width="match_parent"
+    android:layout_height="250dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.ren.smartcity.views.SwitchImageViewPager
+        android:id="@+id/vp_switch_image"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"></com.ren.smartcity.views.SwitchImageViewPager>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center_vertical"
+        android:layout_alignParentBottom="true"
+        android:background="#bf0d0202">
+        <TextView
+            android:id="@+id/tv_title"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="20sp"
+            android:textColor="#fff"
+            android:layout_margin="5dp"
+            android:text="标题"
+            />
+        <LinearLayout
+            android:id="@+id/ll_point_container"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal"></LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

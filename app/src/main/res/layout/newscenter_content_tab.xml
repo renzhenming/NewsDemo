@@ -3,46 +3,11 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:layout_weight="1.5"
-        android:layout_width="match_parent"
-        android:layout_height="0dp">
-        <com.ren.smartcity.views.SwitchImageViewPager
-            android:id="@+id/vp_switch_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"></com.ren.smartcity.views.SwitchImageViewPager>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:gravity="center_vertical"
-            android:layout_alignParentBottom="true"
-            android:background="#bf0d0202">
-            <TextView
-                android:id="@+id/tv_title"
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textSize="20sp"
-                android:textColor="#fff"
-                android:layout_margin="5dp"
-                android:text="标题"
-                />
-            <LinearLayout
-                android:id="@+id/ll_point_container"
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:orientation="horizontal"></LinearLayout>
-        </RelativeLayout>
-    </RelativeLayout>
-
-    <android.support.v7.widget.RecyclerView
+    <com.ren.smartcity.views.RZMRefreshRecyclerView
         android:id="@+id/rv_news"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
-        ></android.support.v7.widget.RecyclerView>
+        ></com.ren.smartcity.views.RZMRefreshRecyclerView>
 
 </LinearLayout>
