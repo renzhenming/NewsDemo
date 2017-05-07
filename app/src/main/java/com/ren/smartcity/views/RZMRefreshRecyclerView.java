@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -82,6 +83,10 @@ public class RZMRefreshRecyclerView extends RecyclerView {
      * 进度条
      */
     private ProgressBar mProgress;
+    /**
+     * 刷新时间
+     */
+    private TextView mTime;
 
     public RZMRefreshRecyclerView(Context context) {
         this(context,null);
@@ -140,6 +145,7 @@ public class RZMRefreshRecyclerView extends RecyclerView {
         mState = (TextView) mHeaderView.findViewById(R.id.tv_state);
         mArrow = (ImageView) mHeaderView.findViewById(R.id.iv_arrow);
         mProgress = (ProgressBar) mHeaderView.findViewById(R.id.pb);
+        mTime = (TextView) mHeaderView.findViewById(R.id.tv_time);
         mProgress.setVisibility(View.GONE);
         View view = mHeaderView.getChildAt(0);
         if(view instanceof LinearLayout){
@@ -170,6 +176,26 @@ public class RZMRefreshRecyclerView extends RecyclerView {
         mFooterView.measure(0,0);
         mFooterViewHeight = mFooterView.getMeasuredHeight();
         mFooterView.setPadding(0,-mFooterViewHeight,0,0);
+    }
+
+    /**
+     * 隐藏头布局
+     * @param loadState 加载成功与否，成功刷新布局，失败不刷新
+     * 隐藏进度条，显示箭头，修改文字，修改状态，loadState决定是否更改刷新时间
+     * 总之：恢复现场到默认状态
+     */
+    public void hideRefreshView(boolean loadState){
+        mProgress.setVisibility(View.GONE);
+        mArrow.setVisibility(View.VISIBLE);
+        mState.setText("下拉刷新");
+        mHeaderRefreshState = REFRESH_DOWN_STATE;
+        if (loadState){
+            String date = DateFormat.getDateFormat(getContext()).format(System.currentTimeMillis());
+            String time = DateFormat.getTimeFormat(getContext()).format(System.currentTimeMillis());
+            mTime.setText(date+" "+time);
+        }
+        getAdapter().notifyDataSetChanged();
+        refreshLayout.setPadding(0,-mHeaderViewHeight,0,0);
     }
 
     @Override
@@ -243,7 +269,10 @@ public class RZMRefreshRecyclerView extends RecyclerView {
                             mArrow.clearAnimation();
                             mArrow.setVisibility(View.GONE);
                             mProgress.setVisibility(View.VISIBLE);
-                            //开始加载数据
+                            //开始刷新加载数据
+                            if (listener != null){
+                                listener.onRefresh();
+                            }
                         }
                     }
                 }
@@ -261,5 +290,19 @@ public class RZMRefreshRecyclerView extends RecyclerView {
         //包装成RAMWraperAdapter
         adapter = new RZMWrapterAdapter(mHeaderView,mFooterView,adapter);
         super.setAdapter(adapter);
+    }
+
+    /**
+     * 回调接口
+     */
+    public OnLoadListener listener;
+
+    public void setOnLoadListener(OnLoadListener listener) {
+        this.listener = listener;
+    }
+
+    public interface OnLoadListener {
+        void onRefresh();
+        void onLoadMore();
     }
 }

@@ -45,6 +45,8 @@ public class NewsCenterContentTabPager {
     private RZMRefreshRecyclerView mRecyclerView;
     private LinearLayout mPointContainer;
     private NewsCenterTabBean tabBean;
+    //新闻数据列表
+    List<NewsCenterTabBean.DataBean.NewsBean> mList = new ArrayList<>();
 
     public NewsCenterContentTabPager(Context context) {
         this.context = context;
@@ -62,6 +64,34 @@ public class NewsCenterContentTabPager {
         mPointContainer = (LinearLayout) childHeaderView.findViewById(R.id.ll_point_container);
         mRecyclerView = (RZMRefreshRecyclerView) view.findViewById(R.id.rv_news);
         mRecyclerView.addChildHeaderView(childHeaderView);
+        mRecyclerView.setOnLoadListener(new RZMRefreshRecyclerView.OnLoadListener() {
+            @Override
+            public void onRefresh() {
+                OkHttpUtils.get()
+                        .url(Constant.HOST+tabBean.getData().getMore())
+                        .build()
+                        .execute(new StringCallback() {
+                            @Override
+                            public void onError(Call call, Exception e, int id) {
+                                MyLogger.d(TAG,e.getMessage());
+                            }
+
+                            @Override
+                            public void onResponse(String response, int id) {
+                                MyLogger.d(TAG,response);
+                                Gson gson = new Gson();
+                                NewsCenterTabBean moreBean = gson.fromJson(response, NewsCenterTabBean.class);
+                                mList.addAll(0,moreBean.getData().getNews());
+                                mRecyclerView.hideRefreshView(true);
+                            }
+                        });
+            }
+
+            @Override
+            public void onLoadMore() {
+
+            }
+        });
         return view;
     }
 
@@ -73,6 +103,7 @@ public class NewsCenterContentTabPager {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         MyLogger.d(TAG,e.getMessage());
+                        mRecyclerView.hideRefreshView(false);
                     }
 
                     @Override
@@ -122,7 +153,8 @@ public class NewsCenterContentTabPager {
         //轮播图数据
         bindTopImages(tabBean.getData().getTopnews());
         //xinwen数据
-        bindRVNews(tabBean.getData().getNews());
+        mList.addAll(tabBean.getData().getNews());
+        bindRVNews(mList);
     }
 
     private void bindRVNews(List<NewsCenterTabBean.DataBean.NewsBean> news) {
