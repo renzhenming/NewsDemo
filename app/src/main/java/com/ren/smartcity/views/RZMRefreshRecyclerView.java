@@ -87,6 +87,10 @@ public class RZMRefreshRecyclerView extends RecyclerView {
      * 刷新时间
      */
     private TextView mTime;
+    /**
+     * 额外添加的头布局
+     */
+    private View mChildHeadView;
 
     public RZMRefreshRecyclerView(Context context) {
         this(context,null);
@@ -164,8 +168,10 @@ public class RZMRefreshRecyclerView extends RecyclerView {
      * @param view
      */
     public void addChildHeaderView(View view){
-        if (mHeaderView != null && view != null)
+        if (mHeaderView != null && view != null){
+            mChildHeadView = view;
             mHeaderView.addView(view);
+        }
     }
 
     /**
@@ -230,6 +236,25 @@ public class RZMRefreshRecyclerView extends RecyclerView {
 
                 int top = -mHeaderViewHeight + distanceY;
                 int firstVisibleItemPosition;
+
+                /**
+                 * 这里存在一个bug,当可见条目为第一个，并且滑动距离dy大于0大于dx的时候
+                 * 由于在刷新布局下还添加了额外的头布局，这就导致当添加的头布局显示一部分并未全部显示的时候
+                 * 也就是这个头布局的最顶端并没有显示出来的时候，由于满足下面的判断条件，就会执行下面的
+                 * refreshLayout.setPadding(0, top, 0, 0);方法，所以就会有一种现象，轻轻拉动一下松手后会有
+                 * 缩回的现象，这里就要判断一下，如果顶部并没有显示的时候不进行处理
+                 */
+                //refreshview在window中的位置
+                int[] rvLocation = new int[2];
+                getLocationInWindow(rvLocation);
+                //额外添加的头布局在window中的位置
+                int[] childViewLocation = new int[2];
+                mChildHeadView.getLocationInWindow(childViewLocation);
+                //对比RecyclerView和ChildHeadView在window中的位置,判断第一个条目是否到达顶端
+                System.out.println("头布局："+childViewLocation[1]+",recycler:"+rvLocation[1]);
+                if (childViewLocation[1]<rvLocation[1]){
+                    return super.dispatchTouchEvent(ev);
+                }
                 //可见条目为第一个，滑动距离大于0
                 if (linearLayoutManager != null){
                     firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
@@ -283,6 +308,27 @@ public class RZMRefreshRecyclerView extends RecyclerView {
                 break;
         }
         return super.dispatchTouchEvent(ev);
+    }
+
+    /**
+     * 根据滑动状态显示脚布局
+     * @param state
+     */
+    @Override
+    public void onScrollStateChanged(int state) {
+        super.onScrollStateChanged(state);
+        if (linearLayoutManager != null){
+            //静止状态并且当前条目位置为adapter适配器中最后一个
+            boolean idleState = state == RecyclerView.SCROLL_STATE_IDLE;
+            int position = linearLayoutManager.findLastVisibleItemPosition();
+            //最后一个条目
+            boolean isLast = position == getAdapter().getItemCount()-1;
+            if (idleState && isLast){
+                mFooterView.setPadding(0,0,0,0);
+                //让脚布局滑动出来
+                smoothScrollToPosition(position);
+            }
+        }
     }
 
     @Override
