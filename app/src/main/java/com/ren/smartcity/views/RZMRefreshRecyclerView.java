@@ -91,6 +91,10 @@ public class RZMRefreshRecyclerView extends RecyclerView {
      * 额外添加的头布局
      */
     private View mChildHeadView;
+    /**
+     * 是否正在加载更多数据
+     */
+    private boolean isLoadingMore = false;
 
     public RZMRefreshRecyclerView(Context context) {
         this(context,null);
@@ -204,6 +208,19 @@ public class RZMRefreshRecyclerView extends RecyclerView {
         refreshLayout.setPadding(0,-mHeaderViewHeight,0,0);
     }
 
+    /**
+     * 隐藏加载更多布局
+     */
+    public void hideLoadMoreView(){
+        //修改加载状态
+        isLoadingMore = false;
+        //隐藏加载布局
+        mFooterView.setPadding(0,-mFooterViewHeight,0,0);
+        //刷新数据
+        getAdapter().notifyDataSetChanged();
+    }
+
+
     @Override
     public void setLayoutManager(LayoutManager layoutManager) {
         if (layoutManager instanceof LinearLayoutManager)
@@ -312,6 +329,7 @@ public class RZMRefreshRecyclerView extends RecyclerView {
 
     /**
      * 根据滑动状态显示脚布局
+     * isLoadingMore为判断是否正在加载中的标记，如果正在加载中，那么不再重新加载
      * @param state
      */
     @Override
@@ -323,10 +341,14 @@ public class RZMRefreshRecyclerView extends RecyclerView {
             int position = linearLayoutManager.findLastVisibleItemPosition();
             //最后一个条目
             boolean isLast = position == getAdapter().getItemCount()-1;
-            if (idleState && isLast){
+            if (idleState && isLast&&listener != null&& !isLoadingMore){
+                //修改加载状态
+                isLoadingMore = true;
+                //显示加载布局
                 mFooterView.setPadding(0,0,0,0);
                 //让脚布局滑动出来
                 smoothScrollToPosition(position);
+                listener.onLoadMore();
             }
         }
     }

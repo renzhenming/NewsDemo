@@ -30,6 +30,8 @@ import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.RunnableFuture;
+
 import okhttp3.Call;
 
 /**
@@ -74,6 +76,7 @@ public class NewsCenterContentTabPager {
                             @Override
                             public void onError(Call call, Exception e, int id) {
                                 MyLogger.d(TAG,e.getMessage());
+                                mRecyclerView.hideRefreshView(true);
                             }
 
                             @Override
@@ -89,6 +92,30 @@ public class NewsCenterContentTabPager {
 
             @Override
             public void onLoadMore() {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        OkHttpUtils.get()
+                                .url(Constant.HOST+tabBean.getData().getMore())
+                                .build()
+                                .execute(new StringCallback() {
+                                    @Override
+                                    public void onError(Call call, Exception e, int id) {
+                                        MyLogger.d(TAG,e.getMessage());
+                                        mRecyclerView.hideLoadMoreView();
+                                    }
+
+                                    @Override
+                                    public void onResponse(String response, int id) {
+                                        MyLogger.d(TAG,response);
+                                        Gson gson = new Gson();
+                                        NewsCenterTabBean moreBean = gson.fromJson(response, NewsCenterTabBean.class);
+                                        mList.addAll(moreBean.getData().getNews());
+                                        mRecyclerView.hideLoadMoreView();
+                                    }
+                                });
+                    }
+                },2000);
 
             }
         });
