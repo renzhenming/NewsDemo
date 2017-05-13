@@ -13,10 +13,13 @@ import android.widget.TextView;
 import com.ren.smartcity.NewsDetailActivity;
 import com.ren.smartcity.R;
 import com.ren.smartcity.bean.NewsCenterTabBean;
+import com.ren.smartcity.db.DbDao;
+import com.ren.smartcity.db.DbHelper;
 import com.ren.smartcity.utils.Constant;
 import com.ren.smartcity.utils.SPUtils;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -28,10 +31,12 @@ import butterknife.InjectView;
 public class NewsListAdapter extends RecyclerView.Adapter {
     private Context context;
     private List<NewsCenterTabBean.DataBean.NewsBean> newsBeanList;
+    private final DbDao dao;
 
     public NewsListAdapter(Context context, List<NewsCenterTabBean.DataBean.NewsBean> newsBeanList) {
         this.context = context;
         this.newsBeanList = newsBeanList;
+        dao = new DbDao(context);
     }
 
     @Override
@@ -49,7 +54,12 @@ public class NewsListAdapter extends RecyclerView.Adapter {
         Picasso.with(context).load(Constant.replaceImageUrl(newsBean.getListimage())).into(viewHolder.ivIcon);
         viewHolder.tvTitle.setText(newsBean.getTitle());
         viewHolder.tvTime.setText(newsBean.getPubdate());
-
+        final ArrayList<String> query = dao.query();
+        if (query.contains(newsBean.getId()+"")){
+            viewHolder.tvTitle.setTextColor(Color.GRAY);
+        }else{
+            viewHolder.tvTitle.setTextColor(Color.BLACK);
+        }
         //条目点击事件
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,6 +68,10 @@ public class NewsListAdapter extends RecyclerView.Adapter {
                 Intent intent = new Intent(context,NewsDetailActivity.class);
                 intent.putExtra("url",Constant.replaceImageUrl(newsBean.getUrl()));
                 context.startActivity(intent);
+                if (!query.contains(newsBean.getId())){
+                    dao.insert(newsBean.getId()+"");
+                    viewHolder.tvTitle.setTextColor(Color.GRAY);
+                }
 
 //                //存储该条新闻的唯一标识：
 //                String id = newsBean.getId()+"";
