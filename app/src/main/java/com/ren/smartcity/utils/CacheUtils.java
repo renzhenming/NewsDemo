@@ -21,7 +21,7 @@ public final class CacheUtils {
         //写数据
         fileOutputStream.write(json.getBytes());
         //关流
-        fileOutputStream.close();;
+        fileOutputStream.close();
     }
 
     //读取json

@@ -18,6 +18,7 @@ import com.ren.smartcity.R;
 import com.ren.smartcity.adapter.NewsListAdapter;
 import com.ren.smartcity.adapter.TabTopNewsAdapter;
 import com.ren.smartcity.bean.NewsCenterTabBean;
+import com.ren.smartcity.utils.CacheUtils;
 import com.ren.smartcity.utils.Constant;
 import com.ren.smartcity.utils.MyLogger;
 import com.ren.smartcity.views.RZMRefreshRecyclerView;
@@ -122,7 +123,7 @@ public class NewsCenterContentTabPager {
         return view;
     }
 
-    public void loadTabNetData(String url){
+    public void loadTabNetData(final String url){
         OkHttpUtils.get()
                 .url(url)
                 .build()
@@ -137,6 +138,11 @@ public class NewsCenterContentTabPager {
                     public void onResponse(String response, int id) {
                         MyLogger.d(TAG,response);
                         parseData(response);
+//                        try {
+//                            CacheUtils.saveCache(context,url,response);
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
                     }
                 });
     }

@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.ren.smartcity.NewsDetailActivity;
 import com.ren.smartcity.R;
 import com.ren.smartcity.bean.NewsCenterTabBean;
 import com.ren.smartcity.utils.Constant;
@@ -54,12 +55,12 @@ public class NewsListAdapter extends RecyclerView.Adapter {
             @Override
             public void onClick(View v) {
                 //跳转到新闻详情界面
-//                Intent intent = new Intent(context,NewsDetailActivity.class);
-//                intent.putExtra("url",newsBean.url);
-//                context.startActivity(intent);
-//
+                Intent intent = new Intent(context,NewsDetailActivity.class);
+                intent.putExtra("url",Constant.replaceImageUrl(newsBean.getUrl()));
+                context.startActivity(intent);
+
 //                //存储该条新闻的唯一标识：
-//                String id = newsBean.id;
+//                String id = newsBean.getId()+"";
 //                //存储在哪里？Sp   File   DB（）
 //                String readNews = SPUtils.getString(context, Constant.KEY_HAS_READ,"");
 //                if(!readNews.contains(id)){
